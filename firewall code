@@ -1,0 +1,80 @@
+# Simulador de Firewall 
+# [Maickol]
+# Materia: Estructura de Datos
+
+from datetime import datetime
+from tabulate import tabulate # type: ignore
+
+# ------------------------------
+# Datos base
+# ------------------------------
+ips_bloqueadas = ["10.20.1.34", "172.135.23.1"]
+registros = []  # matriz: [ [ip, puerto, protocolo, estado, fecha] ]
+
+# ------------------------------
+# Funciones principales
+# ------------------------------
+def RegistrarPaquete():
+    print("\n=== Registrar Paquete Entrante ===")
+    ip = input("IP origen: ")
+    puerto = input("Puerto destino: ")
+    protocolo = input("Protocolo (TCP/UDP): ").upper()
+
+    # Validar si la IP está bloqueada
+    if ip in ips_bloqueadas:
+        estado = "Bloqueado"
+        GenerarAlertas(ip)
+    else:
+        estado = "Permitido"
+
+    fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    registros.append([ip, puerto, protocolo, estado, fecha])
+    print(f"✅ Paquete registrado ({estado}).")
+
+def MostrarRegistros():
+    print("\n=== Registros de Paquetes ===")
+    if not registros:
+        print("No hay registros aún.")
+        return
+
+    print(tabulate(registros, headers=["IP Origen", "Puerto", "Protocolo", "Estado", "Fecha"], tablefmt="fancy_grid"))
+
+def GenerarAlertas(ip):
+    print(f"⚠️ ALERTA: Se detectó intento de acceso bloqueado desde {ip}")
+
+def MostrarMenu():
+    while True:
+        print("\n--- Simulador de Firewall Básico ---")
+        print("1. Registrar Paquete")
+        print("2. Mostrar Registros")
+        print("3. Ver IPs Bloqueadas")
+        print("4. Agregar IP Bloqueada")
+        print("5. Salir")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            RegistrarPaquete()
+        elif opcion == "2":
+            MostrarRegistros()
+        elif opcion == "3":
+            print("\nIPs bloqueadas:", ", ".join(ips_bloqueadas))
+        elif opcion == "4":
+            nueva_ip = input("Ingrese nueva IP a bloquear: ")
+            if nueva_ip not in ips_bloqueadas:
+                ips_bloqueadas.append(nueva_ip)
+                print("✅ IP agregada correctamente.")
+            else:
+                print("Esa IP ya está bloqueada.")
+        elif opcion == "5":
+            print("Saliendo del programa...")
+            break
+        else:
+            print("Opción no válida.")
+
+# ------------------------------
+# Programa principal
+# ------------------------------
+if __name__ == "__main__":
+    MostrarMenu()
+
